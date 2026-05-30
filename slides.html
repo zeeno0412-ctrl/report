@@ -1,0 +1,1760 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI와 함께하는 회사 생활 도전기</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nanum+Pen+Script&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --ink: #1a1a1a;
+    --paper: #faf9f6;
+    --accent: #e8380d;
+    --accent2: #1a1a1a;
+    --muted: #888;
+    --border: #ddd;
+    --handwriting: 'Nanum Pen Script', cursive;
+    --body: 'Noto Sans KR', sans-serif;
+  }
+
+  html { font-size: 16px; }
+  body {
+    font-family: var(--body);
+    background: var(--paper);
+    color: var(--ink);
+    overflow: hidden;
+    width: 100vw;
+    height: 100vh;
+  }
+
+  /* ── SLIDE SYSTEM ── */
+  .deck { width: 100%; height: 100%; position: relative; }
+  .slide {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 64px 80px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.35s ease;
+  }
+  .slide.active {
+    opacity: 1;
+    pointer-events: all;
+  }
+
+  /* ── NAV ── */
+  .nav {
+    position: fixed;
+    bottom: 36px;
+    right: 48px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    z-index: 100;
+  }
+  .nav-btn {
+    width: 40px; height: 40px;
+    border: 1.5px solid var(--ink);
+    background: transparent;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+    transition: background 0.15s;
+    border-radius: 2px;
+  }
+  .nav-btn:hover { background: var(--ink); color: var(--paper); }
+  .nav-count {
+    font-family: var(--handwriting);
+    font-size: 22px;
+    color: var(--muted);
+    min-width: 60px;
+    text-align: center;
+  }
+
+  /* ── PROGRESS ── */
+  .progress {
+    position: fixed;
+    bottom: 0; left: 0;
+    height: 3px;
+    background: var(--accent);
+    transition: width 0.35s ease;
+  }
+
+  /* ── SLIDE NUMBER ── */
+  .slide-tag {
+    position: fixed;
+    top: 36px;
+    right: 48px;
+    font-family: var(--handwriting);
+    font-size: 18px;
+    color: var(--muted);
+  }
+
+  /* ── TYPOGRAPHY ── */
+  .label {
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 20px;
+    font-weight: 400;
+  }
+  h1 {
+    font-family: var(--handwriting);
+    font-size: clamp(48px, 7vw, 88px);
+    line-height: 1.1;
+    font-weight: 400;
+    color: var(--ink);
+    margin-bottom: 28px;
+  }
+  h2 {
+    font-family: var(--handwriting);
+    font-size: clamp(36px, 5vw, 64px);
+    line-height: 1.15;
+    font-weight: 400;
+    color: var(--ink);
+    margin-bottom: 24px;
+  }
+  h3 {
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    color: var(--ink);
+  }
+  p {
+    font-size: 15px;
+    line-height: 1.75;
+    color: #444;
+    max-width: 620px;
+  }
+  .big-p {
+    font-size: 20px;
+    line-height: 1.65;
+    color: #333;
+    max-width: 680px;
+  }
+
+  /* ── ACCENT UNDERLINE ── */
+  .ul-red { border-bottom: 3px solid var(--accent); display: inline; padding-bottom: 2px; }
+
+  /* ── HAND DRAWN ELEMENTS (SVG inline) ── */
+  .sketch-arrow { display: inline-block; }
+
+  /* ── LIST ── */
+  .clean-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    margin-top: 8px;
+  }
+  .clean-list li {
+    font-size: 15px;
+    color: #333;
+    line-height: 1.6;
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+  }
+  .clean-list li::before {
+    content: '';
+    display: block;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+    margin-top: 8px;
+    flex-shrink: 0;
+  }
+
+  /* ── TABLE ── */
+  .simple-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+    margin-top: 8px;
+  }
+  .simple-table th {
+    text-align: left;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding: 0 16px 12px 0;
+    border-bottom: 1px solid var(--border);
+    font-weight: 500;
+  }
+  .simple-table td {
+    padding: 11px 16px 11px 0;
+    border-bottom: 1px solid #f0f0f0;
+    color: #333;
+    vertical-align: top;
+  }
+  .simple-table tr:last-child td { border-bottom: none; }
+  .simple-table td.num {
+    font-variant-numeric: tabular-nums;
+    font-weight: 500;
+  }
+  .simple-table td.good { color: #2a9d5c; font-weight: 600; }
+  .simple-table td.warn { color: #e8380d; font-weight: 600; }
+
+  /* ── 2-COL GRID ── */
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 48px;
+    width: 100%;
+  }
+  .three-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 36px;
+    width: 100%;
+  }
+
+  /* ── STAT BOX ── */
+  .stat {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .stat-num {
+    font-family: var(--handwriting);
+    font-size: 56px;
+    line-height: 1;
+    color: var(--ink);
+  }
+  .stat-label {
+    font-size: 12px;
+    color: var(--muted);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  /* ── DIVIDER ── */
+  .divider {
+    width: 40px;
+    height: 2px;
+    background: var(--accent);
+    margin: 20px 0;
+  }
+
+  /* ── TAG / BADGE ── */
+  .tag {
+    display: inline-block;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border: 1px solid currentColor;
+    border-radius: 2px;
+    margin-right: 8px;
+    margin-bottom: 8px;
+  }
+  .tag.red { color: var(--accent); }
+  .tag.dark { color: var(--ink); }
+  .tag.green { color: #2a9d5c; }
+
+  /* ── TOC ITEM ── */
+  .toc-item {
+    display: flex;
+    align-items: baseline;
+    gap: 20px;
+    padding: 18px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .toc-item:last-child { border-bottom: none; }
+  .toc-num {
+    font-family: var(--handwriting);
+    font-size: 32px;
+    color: var(--accent);
+    width: 36px;
+    flex-shrink: 0;
+  }
+  .toc-text { font-size: 17px; color: #333; line-height: 1.5; }
+  .toc-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+  /* ── RESULT ROW ── */
+  .result-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 10px 0;
+    border-bottom: 1px solid #f0f0f0;
+    font-size: 14px;
+  }
+  .result-row:last-child { border-bottom: none; }
+  .result-icon { width: 20px; text-align: center; }
+  .result-text { flex: 1; color: #333; }
+  .result-note { font-size: 12px; color: var(--muted); }
+
+  /* ── PIPELINE STEP ── */
+  .pipe {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+  .pipe-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+  }
+  .pipe-line-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 20px;
+    flex-shrink: 0;
+  }
+  .pipe-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    border: 2px solid var(--ink);
+    background: var(--paper);
+    flex-shrink: 0;
+    margin-top: 4px;
+  }
+  .pipe-dot.done { background: var(--ink); }
+  .pipe-dot.issue { background: var(--accent); border-color: var(--accent); }
+  .pipe-vert {
+    width: 1px;
+    flex: 1;
+    background: var(--border);
+    min-height: 24px;
+  }
+  .pipe-content {
+    padding-bottom: 20px;
+  }
+  .pipe-title { font-size: 14px; font-weight: 600; color: var(--ink); margin-bottom: 2px; }
+  .pipe-desc { font-size: 13px; color: var(--muted); line-height: 1.5; }
+  .pipe-badge {
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 2px 8px;
+    border-radius: 2px;
+    margin-left: auto;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .pipe-badge.done { background: #e8f5ee; color: #2a9d5c; }
+  .pipe-badge.issue { background: #fdf0ed; color: var(--accent); }
+  .pipe-badge.next { background: #f0f0f0; color: #666; }
+
+  /* ── METRIC BAR ── */
+  .metric-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 8px 0;
+  }
+  .metric-label { font-size: 12px; color: var(--muted); width: 140px; flex-shrink: 0; }
+  .metric-bar-wrap { flex: 1; height: 6px; background: #eee; border-radius: 2px; overflow: hidden; }
+  .metric-bar { height: 100%; background: var(--ink); border-radius: 2px; transition: width 0.6s ease; }
+  .metric-bar.best { background: var(--accent); }
+  .metric-val { font-size: 13px; font-weight: 600; width: 40px; text-align: right; }
+
+  /* ── QUOTE ── */
+  .handquote {
+    font-family: var(--handwriting);
+    font-size: 28px;
+    line-height: 1.4;
+    color: var(--ink);
+    border-left: 3px solid var(--accent);
+    padding-left: 24px;
+    margin: 20px 0;
+    max-width: 600px;
+  }
+
+  /* ── COVER DECORATION ── */
+  .cover-deco {
+    position: absolute;
+    top: 0; right: 0;
+    width: 42%;
+    height: 100%;
+    overflow: hidden;
+    pointer-events: none;
+  }
+
+  /* ── KEYWORD HIGHLIGHT ── */
+  em {
+    font-style: normal;
+    color: var(--accent);
+    font-weight: 600;
+  }
+
+  /* ── FULL WIDTH ── */
+  .full-w { width: 100%; }
+
+  /* ── INLINE FLEX ── */
+  .row { display: flex; align-items: baseline; gap: 16px; flex-wrap: wrap; }
+
+  /* ── SUBTLE BG ── */
+  .bg-warm { background: #f7f5f0; }
+
+  /* ── SECTION HEADER SLIDE ── */
+  .section-slide {
+    background: var(--ink);
+  }
+  .section-slide h2, .section-slide .label, .section-slide p {
+    color: var(--paper);
+  }
+  .section-slide .label { color: rgba(255,255,255,0.4); }
+  .section-slide .divider { background: var(--accent); }
+</style>
+</head>
+<body>
+
+<div class="deck" id="deck">
+
+  <!-- 01 표지 -->
+  <div class="slide active" id="s1">
+    <div class="cover-deco">
+      <img src="start.jpeg" style="width:100%;height:100%;object-fit:cover;display:block;" />
+      <div style="position:absolute;inset:0;background:linear-gradient(to right,var(--paper) 0%,transparent 38%);"></div>
+    </div>
+    <div class="label">AI데이터부문 공유회 · 2026.06</div>
+    <h1>AI데이터부문<br>공유회</h1>
+    <div class="divider"></div>
+    <p class="big-p">ax스쿼드 윤진호</p>
+  </div>
+
+  <!-- 01b 자기소개 -->
+  <div class="slide" id="s1b">
+    <div class="label">발표자 소개</div>
+    <div style="display:flex; width:100%; height:calc(100% - 60px); align-items:center; gap:60px;">
+      <!-- 왼쪽: 이름 + 소속 -->
+      <div style="flex:0 0 auto; width:260px;">
+        <div style="font-family:var(--handwriting); font-size:88px; line-height:1; color:var(--ink); margin-bottom:20px;">윤진호</div>
+        <span class="tag dark">AX스쿼드</span>
+        <div class="divider" style="margin-top:24px;"></div>
+      </div>
+      <!-- 오른쪽: 프로필 항목 -->
+      <div style="flex:1; display:flex; flex-direction:column; gap:28px;">
+        <div style="display:flex; gap:28px; align-items:center; padding-bottom:28px; border-bottom:1px solid var(--border);">
+          <div style="font-size:11px; letter-spacing:0.12em; text-transform:uppercase; color:var(--muted); width:56px; flex-shrink:0;">MBTI</div>
+          <div style="font-family:var(--handwriting); font-size:40px; color:var(--accent); line-height:1;">INFP ~ INTP</div>
+        </div>
+        <div style="display:flex; gap:28px; align-items:center; padding-bottom:28px; border-bottom:1px solid var(--border);">
+          <div style="font-size:11px; letter-spacing:0.12em; text-transform:uppercase; color:var(--muted); width:56px; flex-shrink:0;">취미</div>
+          <div style="font-size:20px; color:#333;"><a href="file:///Users/yunjinho/Downloads/0522/mountain_slideshow.html" target="_blank" style="color:var(--accent); text-decoration:none; border-bottom:1px solid var(--accent); padding-bottom:1px;">100대 명산 등산</a> · 유기견 봉사</div>
+        </div>
+        <div style="display:flex; gap:28px; align-items:center; padding-bottom:28px; border-bottom:1px solid var(--border);">
+          <div style="font-size:11px; letter-spacing:0.12em; text-transform:uppercase; color:var(--muted); width:56px; flex-shrink:0;">특기</div>
+          <div style="font-size:20px; color:#333;">회사 점심 메뉴 외우기</div>
+        </div>
+        <div style="display:flex; gap:28px; align-items:center;">
+          <div style="font-size:11px; letter-spacing:0.12em; text-transform:uppercase; color:var(--muted); width:56px; flex-shrink:0;">음식</div>
+          <div style="font-size:20px; color:#333;">추어탕 · 가을 전어</div>
+        </div>
+      </div>
+      <!-- 오른쪽 끝: 사진 -->
+      <div style="flex:0 0 auto; align-self:stretch; display:flex; align-items:center;">
+        <img src="zeeno.jpg" style="width:260px;height:340px;object-fit:cover;border-radius:4px;display:block;box-shadow:4px 4px 0 var(--border);" />
+      </div>
+    </div>
+  </div>
+
+  <!-- 02 목차 -->
+  <div class="slide" id="s2">
+    <div class="label">목차</div>
+    <h2>오늘 할 얘기</h2>
+    <div class="full-w" style="margin-top:8px;">
+      <div class="toc-item">
+        <div class="toc-num">1</div>
+        <div>
+          <div class="toc-text">OFC 데이터 매뉴얼</div>
+          <div class="toc-sub">Neo4j + LangGraph</div>
+        </div>
+      </div>
+      <div class="toc-item">
+        <div class="toc-num">2</div>
+        <div>
+          <div class="toc-text">틱톡 sLLM 파인튜닝 실패 후기</div>
+          <div class="toc-sub">Llama-3.2-1B + MLX LoRA</div>
+        </div>
+      </div>
+      <div class="toc-item">
+        <div class="toc-num">3</div>
+        <div>
+          <div class="toc-text">MISO RAG 품질 개선 후기</div>
+          <div class="toc-sub">RAGAS + Precision@K</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 03 OFC 섹션 타이틀 -->
+  <div class="slide section-slide" id="s3">
+    <div class="label">케이스 01</div>
+    <h2>OFC 데이터 매뉴얼</h2>
+    <div class="divider"></div>
+    <p style="color:rgba(255,255,255,0.6); font-size:18px; max-width:520px;">
+      OFC는 오늘 내가 해야 할 일을<br>Data로 어떻게 알아내지?
+    </p>
+  </div>
+
+  <!-- 04 OFC 출발점 -->
+  <div class="slide" id="s4">
+    <div class="label">OFC 데이터 매뉴얼 · 출발점</div>
+    <div style="display:flex; width:100%; height:calc(100% - 60px); align-items:center; gap:64px; margin-top:8px;">
+
+      <!-- 왼쪽: 빅픽처 Q1/Q2/Q3 -->
+      <div style="flex:0 0 auto; width:400px; display:flex; flex-direction:column; justify-content:center; gap:0;">
+        <div style="font-size:11px; letter-spacing:0.12em; text-transform:uppercase; color:var(--muted); margin-bottom:28px;">빅 픽처</div>
+        <div style="display:flex; flex-direction:column; gap:0;">
+
+          <div style="display:flex; gap:24px; align-items:center; padding:22px 0; border-bottom:1px solid var(--border);">
+            <span style="font-family:var(--handwriting); font-size:56px; color:var(--accent); line-height:1; flex-shrink:0; width:56px;">Q1</span>
+            <div>
+              <div style="font-size:20px; font-weight:600; color:var(--ink); line-height:1.35;">OFC는 무엇을 하는가?</div>
+              <div style="font-size:13px; color:var(--muted); margin-top:5px;">업무 정의 · 페르소나 이해</div>
+            </div>
+          </div>
+
+          <div style="display:flex; gap:24px; align-items:center; padding:22px 0; border-bottom:1px solid var(--border);">
+            <span style="font-family:var(--handwriting); font-size:56px; color:var(--accent); line-height:1; flex-shrink:0; width:56px;">Q2</span>
+            <div>
+              <div style="font-size:20px; font-weight:600; color:var(--ink); line-height:1.35;">OFC 업무를<br>이해할 수 있는가?</div>
+              <div style="font-size:13px; color:var(--muted); margin-top:5px;">데이터 조회 가능성 검증</div>
+            </div>
+          </div>
+
+          <div style="display:flex; gap:24px; align-items:center; padding:22px 0;">
+            <span style="font-family:var(--handwriting); font-size:56px; color:var(--accent); line-height:1; flex-shrink:0; width:56px;">Q3</span>
+            <div>
+              <div style="font-size:20px; font-weight:600; color:var(--ink); line-height:1.35;">이 정보는 어느<br>테이블에 있는가?</div>
+              <div style="font-size:13px; color:var(--muted); margin-top:5px;">테이블 매핑 · 헤딩</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- 오른쪽: 화이트보드 -->
+      <div style="flex:1; display:flex; justify-content:center; align-items:center; height:100%;">
+        <img src="whiteboard.png" alt="whiteboard" style="max-height:520px; max-width:100%; object-fit:contain; transform:rotate(0.6deg); box-shadow:2px 8px 28px rgba(0,0,0,0.11);">
+      </div>
+
+    </div>
+  </div>
+
+  <!-- 05 OFC 니즈 도출 -->
+  <div class="slide" id="s5">
+    <div class="label">OFC 데이터 매뉴얼 · 니즈 도출</div>
+    <div style="margin-bottom:16px;">
+      <h2 style="margin-bottom:0;">OFC들이 주로 확인하는 지표들</h2>
+    </div>
+    <table style="width:100%; border-collapse:collapse; font-size:14px;">
+      <thead>
+        <tr style="border-bottom:2px solid var(--ink);">
+          <th style="text-align:left; padding:0 16px 10px 0; font-size:10px; letter-spacing:0.1em; text-transform:uppercase; color:var(--muted); font-weight:500; width:26%;">그룹</th>
+          <th style="text-align:left; padding:0 16px 10px 0; font-size:10px; letter-spacing:0.1em; text-transform:uppercase; color:var(--muted); font-weight:500;">세부 항목</th>
+          <th style="text-align:right; padding:0 0 10px 0; font-size:10px; letter-spacing:0.1em; text-transform:uppercase; color:var(--muted); font-weight:500; width:48px;">건수</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- 그룹 1 -->
+        <tr style="background:#faf9f6;">
+          <td rowspan="3" style="padding:7px 16px 7px 0; vertical-align:middle; font-weight:700; font-size:13px; color:var(--ink); border-bottom:2px solid var(--border);">매출 및 실적 달성률</td>
+          <td style="padding:7px 16px 7px 0; border-bottom:1px solid #f0f0f0; color:#333;">일반상품 및 전체 매출 / 객수 / 객단가</td>
+          <td style="text-align:right; padding:7px 0; border-bottom:1px solid #f0f0f0; font-weight:600; color:var(--ink);">4건</td>
+        </tr>
+        <tr style="background:#faf9f6;">
+          <td style="padding:7px 16px 7px 0; border-bottom:1px solid #f0f0f0; color:#333;">Hero / 핵심 카테고리 (신선, FF 등) 달성률</td>
+          <td style="text-align:right; padding:7px 0; border-bottom:1px solid #f0f0f0; font-weight:600; color:var(--ink);">5건</td>
+        </tr>
+        <tr style="background:#faf9f6;">
+          <td style="padding:7px 16px 7px 0; border-bottom:2px solid var(--border); color:#333;">중분류별 매출 추이 및 순위</td>
+          <td style="text-align:right; padding:7px 0; border-bottom:2px solid var(--border); font-weight:600; color:var(--ink);">3건</td>
+        </tr>
+        <!-- 그룹 2 -->
+        <tr>
+          <td rowspan="3" style="padding:7px 16px 7px 0; vertical-align:middle; font-weight:700; font-size:13px; color:var(--ink); border-bottom:2px solid var(--border);">발주 및 권장발주 실행 현황</td>
+          <td style="padding:7px 16px 7px 0; border-bottom:1px solid #f0f0f0; color:#333;">권장발주 수락 및 실행률</td>
+          <td style="text-align:right; padding:7px 0; border-bottom:1px solid #f0f0f0; font-weight:600; color:var(--ink);">4건</td>
+        </tr>
+        <tr>
+          <td style="padding:7px 16px 7px 0; border-bottom:1px solid #f0f0f0; color:#333;">핵심 / 지정 상품 운영 및 판매 현황</td>
+          <td style="text-align:right; padding:7px 0; border-bottom:1px solid #f0f0f0; font-weight:600; color:var(--ink);">3건</td>
+        </tr>
+        <tr>
+          <td style="padding:7px 16px 7px 0; border-bottom:2px solid var(--border); color:#333;">자동발주 실행률</td>
+          <td style="text-align:right; padding:7px 0; border-bottom:2px solid var(--border); font-weight:600; color:var(--ink);">2건</td>
+        </tr>
+        <!-- 그룹 3 -->
+        <tr style="background:#faf9f6;">
+          <td rowspan="2" style="padding:7px 16px 7px 0; vertical-align:middle; font-weight:700; font-size:13px; color:var(--ink); border-bottom:2px solid var(--border);">수익 및 비용 관리</td>
+          <td style="padding:7px 16px 7px 0; border-bottom:1px solid #f0f0f0; color:#333;">발주장려금 수취 금액 및 달성률</td>
+          <td style="text-align:right; padding:7px 0; border-bottom:1px solid #f0f0f0; font-weight:600; color:var(--ink);">4건</td>
+        </tr>
+        <tr style="background:#faf9f6;">
+          <td style="padding:7px 16px 7px 0; border-bottom:2px solid var(--border); color:#333;">폐기 금액 및 폐기 원가 산출</td>
+          <td style="text-align:right; padding:7px 0; border-bottom:2px solid var(--border); font-weight:600; color:var(--ink);">3건</td>
+        </tr>
+        <!-- 그룹 4 -->
+        <tr>
+          <td rowspan="2" style="padding:7px 16px 7px 0; vertical-align:middle; font-weight:700; font-size:13px; color:var(--ink); border-bottom:2px solid var(--border);">재고 및 행사 관리</td>
+          <td style="padding:7px 16px 7px 0; border-bottom:1px solid #f0f0f0; color:#333;">부진재고 축소율 및 소진율</td>
+          <td style="text-align:right; padding:7px 0; border-bottom:1px solid #f0f0f0; font-weight:600; color:var(--ink);">4건</td>
+        </tr>
+        <tr>
+          <td style="padding:7px 16px 7px 0; border-bottom:2px solid var(--border); color:#333;">행사 상품 매출 및 효과 분석</td>
+          <td style="text-align:right; padding:7px 0; border-bottom:2px solid var(--border); font-weight:600; color:var(--ink);">1건</td>
+        </tr>
+        <!-- 그룹 5 -->
+        <tr style="background:#faf9f6;">
+          <td rowspan="2" style="padding:7px 16px 7px 0; vertical-align:middle; font-weight:700; font-size:13px; color:var(--ink);">점포 관리 및 활동 지표</td>
+          <td style="padding:7px 16px 7px 0; border-bottom:1px solid #f0f0f0; color:#333;">점포 방문율 및 방문 전 체크사항 (해피콜 등)</td>
+          <td style="text-align:right; padding:7px 0; border-bottom:1px solid #f0f0f0; font-weight:600; color:var(--ink);">3건</td>
+        </tr>
+        <tr style="background:#faf9f6;">
+          <td style="padding:7px 16px 7px 0; color:#333;">정산금 정보 및 MBO 가점 항목 진척률</td>
+          <td style="text-align:right; padding:7px 0; font-weight:600; color:var(--ink);">2건</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 06 OFC 테스트 결과 -->
+  <div class="slide" id="s6">
+    <div class="label">OFC 데이터 매뉴얼 · 헤딩 결과</div>
+    <h2>12개 항목,<br>실데이터로 직접 쳐봤다</h2>
+    <div class="two-col" style="margin-top:16px; align-items:start; gap:40px;">
+      <div>
+        <h3 style="color:#2a9d5c; margin-bottom:10px;">✓ 즉시 가능 (8개)</h3>
+        <div class="result-row" id="row-sales" onclick="showQuery()" style="cursor:pointer; transition:background 0.15s;" onmouseenter="this.style.background='#f0f0f0'" onmouseleave="this.style.background=''"><div class="result-icon">·</div><div class="result-text">OFC별 점포 매출/객수/객단가 <span style="font-size:11px; color:var(--muted); margin-left:6px;">↗ 클릭</span></div></div>
+        <div class="result-row"><div class="result-icon">·</div><div class="result-text">중분류별 매출 추이 및 순위</div></div>
+        <div class="result-row"><div class="result-icon">·</div><div class="result-text">핵심/지정 상품 운영 현황</div></div>
+        <div class="result-row"><div class="result-icon">·</div><div class="result-text">자동발주 실행률 (FF)</div></div>
+        <div class="result-row"><div class="result-icon">·</div><div class="result-text">발주장려금 달성률</div></div>
+        <div class="result-row"><div class="result-icon">·</div><div class="result-text">폐기 금액 및 원가</div></div>
+        <div class="result-row"><div class="result-icon">·</div><div class="result-text">행사 상품 매출 분석</div></div>
+        <div class="result-row" style="border:none;"><div class="result-icon">·</div><div class="result-text">점포별 해피콜 현황</div></div>
+      </div>
+      <div>
+        <h3 style="color:#f59e0b; margin-bottom:10px;">△ 부분 가능 (2개)</h3>
+        <div class="result-row"><div class="result-icon">·</div><div class="result-text">Hero 카테고리 달성률 <span class="result-note">목표 테이블 없음</span></div></div>
+        <div class="result-row" style="margin-bottom:24px;"><div class="result-icon">·</div><div class="result-text">자동발주 (공산품) <span class="result-note">FF만 가능</span></div></div>
+        <h3 style="color:var(--accent); margin-bottom:10px;">✕ 불가 (4개)</h3>
+        <div class="result-row"><div class="result-icon">·</div><div class="result-text">권장발주 수락 및 실행률</div></div>
+        <div class="result-row"><div class="result-icon">·</div><div class="result-text">부진 재고 축소율</div></div>
+        <div class="result-row" style="border:none;"><div class="result-icon">·</div><div class="result-text">정산금 / MBO 가점항목</div></div>
+        <p style="font-size:12px; color:var(--muted); margin-top:8px;">→ 기간계에만 존재, 정보계 적재 필요</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 07 OFC 기술 -->
+  <div class="slide" id="s7">
+    <div class="label">OFC 데이터 매뉴얼 · 테이블 매핑</div>
+    <div style="display:flex; width:100%; height:calc(100% - 60px); align-items:center; gap:56px; margin-top:8px;">
+      <div style="flex:0 0 auto; width:280px;">
+        <h2 style="margin-bottom:16px;">테이블 ↔<br>업무 매핑</h2>
+        <div class="divider"></div>
+        <p style="margin-top:16px; font-size:14px; line-height:1.7;">테이블 간 조인으로<br>얻을 수 있는 태스크 정리.<br><br>어떤 업무 질문이<br>어느 테이블 조합에서<br>나오는지 구조화했다.</p>
+      </div>
+      <div style="flex:1; display:flex; justify-content:center; align-items:center; height:100%;">
+        <img src="https://cdn.gamma.app/iou4ln21ihv30wd/ea9bf051d6254bc8a6c5e2d32ad5b14f/original/image.png"
+             alt="테이블 업무 매핑"
+             style="max-height:520px; max-width:100%; object-fit:contain; border-radius:4px; box-shadow:2px 8px 28px rgba(0,0,0,0.12);">
+      </div>
+    </div>
+  </div>
+
+  <!-- ③ Neo4j 선택 이유 -->
+  <div class="slide" id="s8a">
+    <div class="label">OFC 데이터 매뉴얼 · Neo4j 도입</div>
+    <div style="display:flex; width:100%; height:calc(100% - 60px); align-items:center; gap:64px; margin-top:8px;">
+
+      <!-- 왼쪽: 여정 -->
+      <div style="flex:0 0 auto; width:340px;">
+        <h2 style="margin-bottom:24px;">왜<br>Neo4j인가</h2>
+        <div class="pipe">
+          <div class="pipe-row">
+            <div class="pipe-line-col"><div class="pipe-dot done"></div><div class="pipe-vert"></div></div>
+            <div class="pipe-content">
+              <div class="pipe-title">부문장님 코멘트</div>
+              <div class="pipe-desc">"RDF 형태로 하면 온톨로지 가능하지 않을까?"</div>
+            </div>
+          </div>
+          <div class="pipe-row">
+            <div class="pipe-line-col"><div class="pipe-dot done"></div><div class="pipe-vert"></div></div>
+            <div class="pipe-content">
+              <div class="pipe-title">온톨로지 스터디 → Neo4j 도커 이미지 확보</div>
+              <div class="pipe-desc">Neo4j = 주어-동사-목적어 구조 — RDF에 딱 부합</div>
+            </div>
+          </div>
+          <div class="pipe-row">
+            <div class="pipe-line-col"><div class="pipe-dot done"></div><div class="pipe-vert"></div></div>
+            <div class="pipe-content">
+              <div class="pipe-title">도커 줍고, Claude Code로 뚝딱</div>
+              <div class="pipe-desc">테이블 던져주고 "Neo4j로 말아줘" — 알아서 구성됨</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 오른쪽: 그래프 구조 SVG -->
+      <!-- 오른쪽: 그래프 + 테이블 -->
+      <div style="flex:1; display:flex; flex-direction:column; gap:16px; height:100%; justify-content:center;">
+
+        <!-- 그래프 이미지 -->
+        <div style="flex:1; border-radius:6px; box-shadow:0 4px 20px rgba(0,0,0,0.1); overflow:hidden; background:#fff; min-height:0;">
+          <img src="graphdb.png" alt="Neo4j 그래프"
+               style="width:100%; height:100%; object-fit:contain; object-position:center; display:block;">
+        </div>
+
+        <!-- 노드 + 관계 한 줄 -->
+        <div style="flex:0 0 auto; display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+
+          <!-- 노드 -->
+          <div style="background:#f7f5f0; border-radius:4px; padding:8px 12px;">
+            <div style="font-size:10px; letter-spacing:0.1em; text-transform:uppercase; color:var(--muted); margin-bottom:6px; font-weight:500;">노드</div>
+            <div style="display:flex; flex-wrap:wrap; gap:6px 12px; font-size:11px;">
+              <span><span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:#e8a020;margin-right:4px;vertical-align:middle;"></span><b>OFC</b></span>
+              <span><span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:#4a90d9;margin-right:4px;vertical-align:middle;"></span><b>Store</b></span>
+              <span><span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:#e87070;margin-right:4px;vertical-align:middle;"></span><b>Team</b></span>
+              <span><span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:#5ab570;margin-right:4px;vertical-align:middle;"></span><b>Product</b></span>
+              <span><span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:#9b7fd4;margin-right:4px;vertical-align:middle;"></span><b>HappyCall</b></span>
+              <span><span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:#d45a5a;margin-right:4px;vertical-align:middle;"></span><b>WasteRecord</b></span>
+            </div>
+          </div>
+
+          <!-- 관계 -->
+          <div style="background:#f7f5f0; border-radius:4px; padding:8px 12px;">
+            <div style="font-size:10px; letter-spacing:0.1em; text-transform:uppercase; color:var(--muted); margin-bottom:6px; font-weight:500;">관계</div>
+            <div style="display:flex; flex-wrap:wrap; gap:4px 16px; font-size:11px; font-family:monospace;">
+              <span style="color:#4a6fa5; font-weight:600;">:MANAGES <span style="color:#888; font-weight:400;">7</span></span>
+              <span style="color:#4a6fa5; font-weight:600;">:BELONGS_TO <span style="color:#888; font-weight:400;">102</span></span>
+              <span style="color:#4a6fa5; font-weight:600;">:SOLD <span style="color:#2a9d5c; font-weight:700;">176,184건</span></span>
+              <span style="color:#4a6fa5; font-weight:600;">:ORDERED <span style="color:#888; font-weight:400;">76,998건</span></span>
+              <span style="color:#4a6fa5; font-weight:600;">:HAS_WASTE <span style="color:#e8380d; font-weight:700;">293,134건</span></span>
+              <span style="color:#4a6fa5; font-weight:600;">:HAS_COMPLAINT <span style="color:#888; font-weight:400;">259건</span></span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ④ 어라라 이게 되네 -->
+  <div class="slide" id="s8b">
+    <div class="label">OFC 데이터 매뉴얼 · Text-to-Cypher</div>
+    <div style="display:flex; width:100%; height:calc(100% - 60px); gap:40px; align-items:flex-start; margin-top:8px;">
+
+      <!-- 왼쪽: 설명 -->
+      <div style="flex:0 0 auto; width:220px; padding-top:8px;">
+        <h2 style="font-size:clamp(28px,3.5vw,48px); margin-bottom:16px;">어라라<br>이게 되네</h2>
+        <div class="divider"></div>
+        <p style="margin-top:16px; font-size:13px; line-height:1.8; color:#444;">자연어 질문 하나로<br>복잡한 Cypher가<br>자동 생성됐다.<br><br>신기해서<br>바로 공유했음.</p>
+        <div class="tag green" style="margin-top:20px;">Neo4j Cypher</div>
+        <div class="tag dark" style="margin-top:4px;">Text-to-Query</div>
+      </div>
+
+      <!-- 오른쪽: 실제 스크린샷 -->
+      <div style="flex:1; display:flex; align-items:center; justify-content:center; height:100%;">
+        <img src="첫채팅.png" alt="text-to-cypher 첫 실행"
+             style="max-height:500px; max-width:100%; object-fit:contain; border-radius:4px; box-shadow:2px 8px 28px rgba(0,0,0,0.13);">
+      </div>
+
+    </div>
+  </div>
+
+  <!-- 09 OFC 아키텍처 상세 (NEW) -->
+  <div class="slide" id="s9">
+    <div class="label">OFC 데이터 매뉴얼 · 아키텍처</div>
+    <div style="display:flex; width:100%; height:calc(100% - 60px); gap:56px; align-items:center; margin-top:8px;">
+
+      <!-- 왼쪽: 타이틀 + 파이프 -->
+      <div style="flex:0 0 300px; display:flex; flex-direction:column; justify-content:center;">
+        <h2 style="margin-bottom:20px;">LangGraph<br>워크플로우</h2>
+        <div class="pipe">
+          <div class="pipe-row">
+            <div class="pipe-line-col"><div class="pipe-dot done"></div><div class="pipe-vert"></div></div>
+            <div class="pipe-content">
+              <div class="pipe-title">Step 1 · 자연어 질문 입력</div>
+              <div class="pipe-desc">OFC — "오늘 폐기 많은 점포는?"</div>
+            </div>
+          </div>
+          <div class="pipe-row">
+            <div class="pipe-line-col"><div class="pipe-dot done"></div><div class="pipe-vert"></div></div>
+            <div class="pipe-content">
+              <div class="pipe-title">Step 2 · 컨텍스트 분석</div>
+              <div class="pipe-desc">LangGraph — 의도 파악, 쿼리 라우팅</div>
+            </div>
+          </div>
+          <div class="pipe-row">
+            <div class="pipe-line-col"><div class="pipe-dot done"></div><div class="pipe-vert"></div></div>
+            <div class="pipe-content">
+              <div class="pipe-title">Step 3 · Neo4j 쿼리 실행</div>
+              <div class="pipe-desc">Fan-out — 매출 · 폐기 · 해피콜 · FF 병렬 조회</div>
+            </div>
+          </div>
+          <div class="pipe-row">
+            <div class="pipe-line-col"><div class="pipe-dot done"></div><div class="pipe-vert"></div></div>
+            <div class="pipe-content">
+              <div class="pipe-title">Step 4 · 브리핑 생성</div>
+              <div class="pipe-desc">Claude API — 우선순위 정렬 후 자연어 요약</div>
+            </div>
+          </div>
+          <div class="pipe-row">
+            <div class="pipe-line-col"><div class="pipe-dot"></div></div>
+            <div class="pipe-content">
+              <div class="pipe-title">Step 5 · 품질 모니터링</div>
+              <div class="pipe-desc">Langfuse — 비동기 품질 추적</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 오른쪽: 이미지 -->
+      <div style="flex:1; height:100%; display:flex; align-items:center; justify-content:center;">
+        <img src="Langgraph_flow.png" alt="LangGraph 워크플로우"
+             style="max-height:100%; max-width:100%; object-fit:contain; border-radius:4px; box-shadow:2px 8px 24px rgba(0,0,0,0.1);">
+      </div>
+
+    </div>
+  </div>
+
+  <!-- 10 OFC AI 어시스턴트 시나리오 (NEW) -->
+  <div class="slide" id="s10">
+    <div class="label">OFC 데이터 매뉴얼 · 브리핑 결과</div>
+    <div style="display:flex; width:100%; height:calc(100% - 60px); gap:56px; align-items:center; margin-top:8px;">
+
+      <!-- 왼쪽 -->
+      <div style="flex:0 0 260px; display:flex; flex-direction:column; justify-content:center; gap:24px;">
+        <div>
+          <h2 style="margin-bottom:12px;">실제<br>브리핑 결과</h2>
+          <div class="divider"></div>
+          <p style="margin-top:16px; font-size:14px; line-height:1.75;">OFC 이름을 입력하면 오늘의 매출 · 폐기 · 해피콜 · FF 발주 현황을 우선순위 순으로 브리핑해준다.</p>
+        </div>
+        <div>
+          <div class="tag green" style="margin-bottom:8px;">Cloudflare · 실제 배포 완료</div>
+          <a href="https://ofc.gsretail-axsquad.org/" target="_blank"
+             style="display:flex; align-items:center; gap:8px; padding:10px 14px; border:1.5px solid var(--ink); border-radius:3px; text-decoration:none; color:var(--ink); font-size:13px; font-weight:600; transition:background 0.15s;"
+             onmouseenter="this.style.background='var(--ink)'; this.style.color='var(--paper)'"
+             onmouseleave="this.style.background='transparent'; this.style.color='var(--ink)'">
+            <span>↗</span> ofc.gsretail-axsquad.org
+          </a>
+        </div>
+      </div>
+
+      <!-- 오른쪽: 브리핑 예시 이미지 -->
+      <div style="flex:1; height:100%; display:flex; align-items:center; justify-content:center;">
+        <img src="브리핑 예시.png" alt="브리핑 예시"
+             style="max-height:100%; max-width:100%; object-fit:contain; border-radius:6px; box-shadow:2px 8px 28px rgba(0,0,0,0.12);">
+      </div>
+
+    </div>
+  </div>
+
+  <!-- 12 OFC 레슨 런 -->
+  <div class="slide" id="s11b">
+    <div class="label">OFC 데이터 매뉴얼 · 레슨 런</div>
+    <div style="display:flex; width:100%; height:calc(100% - 60px); gap:64px; align-items:center; margin-top:8px;">
+
+      <!-- 왼쪽: 배운 것 -->
+      <div style="flex:1; display:flex; flex-direction:column; justify-content:center;">
+        <h2 style="margin-bottom:24px;">배운 것</h2>
+
+        <div style="padding:20px 24px; background:#f7f5f0; border-radius:4px; margin-bottom:16px;">
+          <div style="font-size:11px; letter-spacing:0.1em; text-transform:uppercase; color:var(--muted); margin-bottom:10px;">Graph DB 장점</div>
+          <p style="font-size:15px; color:var(--ink); line-height:1.7; max-width:none;">관계 중심으로 설계하면 <em>쿼리가 심플해진다.</em><br>JOIN 중첩 없이 노드 탐색만으로 복합 질문 처리 가능.</p>
+        </div>
+
+        <div style="padding:20px 24px; background:#f7f5f0; border-radius:4px;">
+          <div style="font-size:11px; letter-spacing:0.1em; text-transform:uppercase; color:var(--muted); margin-bottom:10px;">아직 미지수</div>
+          <p style="font-size:15px; color:var(--ink); line-height:1.7; max-width:none;">온톨로지에서 흔히 말하는 <em>추론(Inference)</em>이 실제로 되는지는 검증 중.</p>
+        </div>
+      </div>
+
+      <!-- 오른쪽: To-do -->
+      <div style="flex:1; display:flex; flex-direction:column; justify-content:center;">
+        <h2 style="margin-bottom:24px;">To-do</h2>
+
+        <div class="pipe">
+          <div class="pipe-row">
+            <div class="pipe-line-col"><div class="pipe-dot"></div><div class="pipe-vert"></div></div>
+            <div class="pipe-content">
+              <div class="pipe-title">거버넌스 컬럼 정의서 입력</div>
+              <div class="pipe-desc">→ Text2Cypher 컨텍스트 주입 — 쿼리 정확도 향상</div>
+            </div>
+          </div>
+          <div class="pipe-row">
+            <div class="pipe-line-col"><div class="pipe-dot"></div><div class="pipe-vert"></div></div>
+            <div class="pipe-content">
+              <div class="pipe-title">판단 기준치 (Rule) 수립</div>
+              <div class="pipe-desc">폐기 급증 · 해피콜 이상 등 임계값 정의</div>
+            </div>
+          </div>
+          <div class="pipe-row">
+            <div class="pipe-line-col"><div class="pipe-dot"></div></div>
+            <div class="pipe-content">
+              <div class="pipe-title">데이터 확충</div>
+              <div class="pipe-desc">현재 샘플 수준 → 3~6개월치 실데이터로 확장</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- 11 틱톡 섹션 타이틀 -->
+  <div class="slide section-slide" id="s11">
+    <div class="label">케이스 02</div>
+    <h2>틱톡 sLLM<br>파인튜닝 실패 후기</h2>
+    <div class="divider"></div>
+    <p style="color:rgba(255,255,255,0.6); font-size:18px;">GS리테일화된 LLM을 만들어보고 싶었다</p>
+  </div>
+
+  <!-- 12 틱톡 목적 -->
+  <div class="slide" id="s12">
+    <div class="label">틱톡 sLLM · 출발점</div>
+    <h2>꿈은 컸다</h2>
+    <div style="display:flex; width:100%; gap:56px; margin-top:20px; align-items:start;">
+
+      <!-- 왼쪽: 목적 + 모델 -->
+      <div style="flex:0 0 340px;">
+        <ul class="clean-list">
+          <li>트렌즈 내 틱톡 데이터 <em>2만 건 중 12,856건</em> 추출</li>
+          <li>GS리테일 전용 sLLM 만들기</li>
+        </ul>
+        <div class="divider" style="margin-top:24px;"></div>
+        <div style="font-size:12px; color:var(--muted); margin-top:4px; line-height:1.7;">
+          Llama-3.2-1B-Instruct-4bit<br>
+          Apple MLX + LoRA · 600 iters
+        </div>
+      </div>
+
+      <!-- 오른쪽: 로우데이터 테이블 -->
+      <div style="flex:1; overflow:hidden; min-width:0;">
+        <div style="font-size:11px; letter-spacing:0.1em; text-transform:uppercase; color:var(--muted); margin-bottom:10px;">실제 학습 원본 데이터 (틱톡 크롤링)</div>
+        <table class="simple-table" style="font-size:12px; width:100%; table-layout:fixed;">
+            <thead>
+              <tr>
+                <th style="width:68px;">조회수</th>
+                <th style="width:80px;">작성자</th>
+                <th>제목 / 본문</th>
+                <th style="width:100px;">태그</th>
+                <th style="width:56px;">팔로워</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr style="background:#fdf8f6;">
+                <td class="num">27,400</td>
+                <td style="color:#555; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">아사링</td>
+                <td style="color:#b44; font-weight:500; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">카푸리썬#fyp #fypシ</td>
+                <td style="color:var(--muted); font-size:11px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">fyp, fypシ</td>
+                <td class="num">460만</td>
+              </tr>
+              <tr>
+                <td class="num">11,600</td>
+                <td style="color:#555; font-size:11px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">mariavehera257</td>
+                <td style="font-size:12px; color:#555; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">Dubai cheese bomb new product...</td>
+                <td style="color:var(--muted); font-size:11px;">—</td>
+                <td class="num">99만</td>
+              </tr>
+              <tr style="background:#fdf8f6;">
+                <td class="num">4,491</td>
+                <td style="color:#555; font-size:11px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">리보 LEEBO</td>
+                <td style="font-size:12px; color:#555; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">4만원치 산 중국간식이 아직 많이 남아 있어욤ㅎㅎ...</td>
+                <td style="color:var(--muted); font-size:11px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">fyp, eating, asmr...</td>
+                <td class="num">26만</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- 13 세팅 히스토리 -->
+  <div class="slide" id="s13">
+    <div class="label">틱톡 sLLM · 환경 세팅</div>
+    <h2>일단 돌리는 것부터가<br>일이었다</h2>
+
+    <!-- 가로 타임라인 -->
+    <div style="margin-top:32px; display:flex; align-items:flex-start; gap:0; width:100%;">
+
+      <!-- STEP 1 -->
+      <div style="flex:1; min-width:0; text-align:center;">
+        <div style="width:12px; height:12px; border-radius:50%; border:2px solid var(--ink); background:var(--paper); margin:0 auto 10px;"></div>
+        <div style="font-size:11px; color:var(--muted); font-weight:600; letter-spacing:0.06em; margin-bottom:6px;">STEP 1</div>
+        <div style="font-weight:700; font-size:14px; margin-bottom:6px;">Python 아키텍처</div>
+        <p style="font-size:12px; color:#555; margin:0; line-height:1.6;">x86_64에서 MLX 설치 실패<br>→ arm64 conda로 재설치</p>
+      </div>
+
+      <!-- 연결선 -->
+      <div style="width:32px; flex-shrink:0; height:2px; background:var(--border); margin-top:6px;"></div>
+
+      <!-- STEP 2 -->
+      <div style="flex:1; min-width:0; text-align:center;">
+        <div style="width:12px; height:12px; border-radius:50%; border:2px solid var(--ink); background:var(--paper); margin:0 auto 10px;"></div>
+        <div style="font-size:11px; color:var(--muted); font-weight:600; letter-spacing:0.06em; margin-bottom:6px;">STEP 2</div>
+        <div style="font-weight:700; font-size:14px; margin-bottom:6px;">데이터 포맷</div>
+        <p style="font-size:12px; color:#555; margin:0; line-height:1.6;">JSONL 포맷 뒤늦게 파악<br>→ <code style="font-size:11px; background:#eee; padding:1px 4px; border-radius:3px;">messages</code> 구조로 변환</p>
+      </div>
+
+      <!-- 연결선 -->
+      <div style="width:32px; flex-shrink:0; height:2px; background:var(--border); margin-top:6px;"></div>
+
+      <!-- STEP 3 -->
+      <div style="flex:1; min-width:0; text-align:center;">
+        <div style="width:12px; height:12px; border-radius:50%; border:2px solid var(--ink); background:var(--paper); margin:0 auto 10px;"></div>
+        <div style="font-size:11px; color:var(--muted); font-weight:600; letter-spacing:0.06em; margin-bottom:6px;">STEP 3</div>
+        <div style="font-weight:700; font-size:14px; margin-bottom:6px;">OOM</div>
+        <p style="font-size:12px; color:#555; margin:0; line-height:1.6;">메모리 터짐<br>→ batch 1 · seq 256으로 낮춤</p>
+      </div>
+
+      <!-- 연결선 -->
+      <div style="width:32px; flex-shrink:0; height:2px; background:var(--border); margin-top:6px;"></div>
+
+      <!-- 완주 -->
+      <div style="flex:1; min-width:0; text-align:center;">
+        <div style="width:12px; height:12px; border-radius:50%; border:2px solid var(--accent); background:var(--accent); margin:0 auto 10px;"></div>
+        <div style="font-size:11px; color:var(--accent); font-weight:600; letter-spacing:0.06em; margin-bottom:6px;">완주</div>
+        <div style="font-weight:700; font-size:14px; margin-bottom:6px;">600 iters ✓</div>
+        <p style="font-size:12px; color:#555; margin:0; line-height:1.6;">학습 완료<br>이제 돌려봐야지</p>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- 13b 실험 결과: 돌았는데 왜 이럴까 -->
+  <div class="slide" id="s13b">
+    <div class="label">틱톡 sLLM · 실험 결과</div>
+    <h2>돌았는데<br>왜 이럴까</h2>
+    <div style="margin-top:20px; display:flex; gap:32px; align-items:stretch; width:100%;">
+
+      <!-- 왼쪽: 프롬프트 구조 -->
+      <div style="flex:1.3; display:flex; flex-direction:column; gap:7px;">
+        <div style="font-size:11px; color:var(--muted); font-weight:600; letter-spacing:0.08em; margin-bottom:4px;">프롬프트 구조</div>
+
+        <!-- SYSTEM -->
+        <div style="background:#f7f5f0; border-radius:5px; padding:9px 13px; border-left:3px solid var(--border);">
+          <div style="font-size:10px; color:var(--muted); font-weight:600; letter-spacing:0.06em; margin-bottom:3px;">SYSTEM</div>
+          <div style="font-size:12px; color:#555;">100만 팔로워 틱톡 인플루언서처럼 작성해줘</div>
+        </div>
+
+        <!-- USER 예시 -->
+        <div style="background:#f7f5f0; border-radius:5px; padding:9px 13px; border-left:3px solid var(--border);">
+          <div style="font-size:10px; color:var(--muted); font-weight:600; letter-spacing:0.06em; margin-bottom:3px;">USER (예시)</div>
+          <div style="font-size:12px; color:#555;">태그: <strong>여름, 바다, 여행</strong></div>
+        </div>
+
+        <!-- ASSISTANT 예시 ← 문제 -->
+        <div style="background:#fdf0ed; border-radius:5px; padding:9px 13px; border-left:3px solid var(--accent);">
+          <div style="font-size:10px; color:var(--accent); font-weight:600; letter-spacing:0.06em; margin-bottom:3px;">ASSISTANT (예시 답변)</div>
+          <div style="font-size:12px; color:#333; line-height:1.5;">여러분! 🌊 드디어 여름 휴가 시즌이 왔어요!<br><strong style="color:var(--accent);">#여름 #바다 #여행스타그램</strong> ← 모델이 외운 것</div>
+        </div>
+
+        <!-- USER 진짜 -->
+        <div style="background:#f7f5f0; border-radius:5px; padding:9px 13px; border-left:3px solid var(--border);">
+          <div style="font-size:10px; color:var(--muted); font-weight:600; letter-spacing:0.06em; margin-bottom:3px;">USER (진짜 질문)</div>
+          <div style="font-size:12px; color:#555;">태그: <strong>GS25, 편의점, 신상</strong></div>
+        </div>
+      </div>
+
+      <!-- 세로 구분선 -->
+      <div style="width:1px; background:var(--border); flex-shrink:0;"></div>
+
+      <!-- 오른쪽: 실제 결과 -->
+      <div style="flex:1; display:flex; flex-direction:column; justify-content:center; gap:14px;">
+        <div style="font-size:11px; color:var(--muted); font-weight:600; letter-spacing:0.08em; margin-bottom:4px;">결과</div>
+
+        <div>
+          <div style="font-size:12px; color:#888; margin-bottom:4px;">태그: GS25, 편의점, 신상</div>
+          <div style="font-size:14px; font-weight:600; color:var(--accent);">→ #여름 #바다 #여행</div>
+        </div>
+        <div>
+          <div style="font-size:12px; color:#888; margin-bottom:4px;">태그: 라면, 야식, 혼밥</div>
+          <div style="font-size:14px; font-weight:600; color:var(--accent);">→ #여름 #바다 #여행스타그램</div>
+        </div>
+        <div>
+          <div style="font-size:12px; color:#888; margin-bottom:4px;">태그: 다이어트, 샐러드, 건강</div>
+          <div style="font-size:14px; font-weight:600; color:var(--accent);">→ #여름 #바다 #여행</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- 14 파봤더니 (데이터 분포) -->
+  <div class="slide" id="s14">
+    <div class="label">틱톡 sLLM · 원인 분석</div>
+    <h2>데이터가<br>문제였다</h2>
+    <div class="three-col" style="margin-top:24px; align-items:start;">
+      <div>
+        <div class="tag green">정상</div>
+        <div class="stat" style="margin-top:12px;">
+          <div class="stat-num">47%</div>
+          <div class="stat-label">6,059개</div>
+        </div>
+        <p style="margin-top:10px; font-size:13px; color:#444;">30자 이상, 맥락 있는 텍스트</p>
+      </div>
+      <div>
+        <div class="tag" style="color:#d97706; border-color:#d97706;">단답형</div>
+        <div class="stat" style="margin-top:12px;">
+          <div class="stat-num">40%</div>
+          <div class="stat-label">5,074개</div>
+        </div>
+        <p style="margin-top:10px; font-size:13px; color:#444;">"버거 8천원대부터ㄷㄷ"<br>맥락도 구조도 없음</p>
+      </div>
+      <div>
+        <div class="tag red">태그무새</div>
+        <div class="stat" style="margin-top:12px;">
+          <div class="stat-num">13%</div>
+          <div class="stat-label">1,723개</div>
+        </div>
+        <p style="margin-top:10px; font-size:13px; color:#444;">"#라면 #계란라면 #라면레시피"<br>태그만 나열</p>
+      </div>
+    </div>
+    <div class="divider" style="margin-top:28px;"></div>
+    <p><em>52.9%</em>가 30자 미만 또는 태그 나열 → 모델이 "짧게 태그만 쓰는 것"을 정답으로 학습</p>
+  </div>
+
+  <!-- 15 레슨런 -->
+  <div class="slide" id="s15">
+    <div class="label">틱톡 sLLM · 레슨런</div>
+    <h2>레슨런</h2>
+    <div class="two-col" style="margin-top:24px; align-items:start; gap:48px;">
+      <div>
+        <h3>배운 것</h3>
+        <div class="divider" style="width:24px; margin:10px 0;"></div>
+        <ul class="clean-list">
+          <li>모델이 나쁜 게 아니라 <em>데이터가 나빴다</em></li>
+          <li>Garbage In, Garbage Out</li>
+        </ul>
+        <p style="margin-top:16px; font-size:13px; color:var(--muted); line-height:1.7;">GS리테일에서 sLLM을 쓸 일은<br>많지 않을 것 같다.</p>
+      </div>
+      <div>
+        <h3>그래도 Gemma, 찍먹해보자</h3>
+        <div class="divider" style="width:24px; margin:10px 0;"></div>
+        <ul class="clean-list">
+          <li>구글 오픈모델 — 상업적 무료 사용</li>
+          <li>1B~27B 사이즈, M-series 로컬 실행 가능</li>
+          <li>한국어 성능 Llama 대비 개선</li>
+          <li>데이터만 잘 정제하면 재시도 가능</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- 16 MISO 섹션 타이틀 -->
+  <div class="slide section-slide" id="s16">
+    <div class="label">케이스 03</div>
+    <h2>MISO RAG<br>품질 개선</h2>
+    <div class="divider"></div>
+    <p style="color:rgba(255,255,255,0.6); font-size:18px;">매뉴얼이 없어서, 직접 만들고, 5번 고쳤다</p>
+  </div>
+
+  <!-- 17 MISO 배경 -->
+  <div class="slide" id="s17">
+    <div class="label">MISO RAG · 배경</div>
+    <h2>MISO RAG 품질 개선<br>히스토리</h2>
+    <div style="margin-top:20px; display:flex; gap:40px; align-items:center; width:100%;">
+      <!-- 텍스트 좌측 -->
+      <div style="flex:0 0 38%; min-width:0;">
+        <ul class="clean-list">
+          <li>MISO — GS리테일 전사 LLM 노코드 툴</li>
+          <li>LLM 지식 낮은 임직원들, 버그 아닌데 버그로 접수</li>
+          <li>v0로 버그 접수 봇 개발 중 → RAG 씌웠더니 통신 끊김</li>
+          <li>그냥 미소 안에서 만들자</li>
+        </ul>
+        <div class="divider" style="width:24px; margin:16px 0 12px;"></div>
+        <p style="font-size:13px; color:#555; line-height:1.7;">매뉴얼은 GitBook에 있었는데 파일이 없었다<br>→ 240페이지 직접 복붙해서 시작</p>
+      </div>
+      <!-- 이미지 우측 -->
+      <div style="flex:0 0 48%; min-width:0;">
+        <img src="miso_manual.png" alt="MISO 매뉴얼" style="width:100%; max-height:340px; object-fit:contain; object-position:top left; border-radius:10px; box-shadow:4px 8px 32px rgba(0,0,0,0.14); border:1px solid #e8e4d9;">
+      </div>
+    </div>
+  </div>
+
+  <!-- 18 질문지 -->
+  <div class="slide" id="s18">
+    <div class="label">MISO RAG · 평가 설계</div>
+    <h2>평가 질문 기준 수립</h2>
+    <div style="margin-top:20px; display:flex; gap:12px; width:100%;">
+
+      <div style="flex:1; background:#f7f5f0; border-radius:6px; padding:14px 16px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+          <div class="tag green" style="margin:0;">기본 사용법</div>
+          <span style="font-size:12px; color:var(--muted);">4개</span>
+        </div>
+        <ul style="list-style:none; padding:0; margin:0; font-size:12px; color:#555; line-height:2;">
+          <li>· 이미지 생성하려면?</li>
+          <li>· 비밀번호 재설정?</li>
+          <li>· 즐겨찾기 추가 방법?</li>
+          <li>· 업로드 가능한 파일 형식?</li>
+        </ul>
+      </div>
+
+      <div style="flex:1; background:#f7f5f0; border-radius:6px; padding:14px 16px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+          <div class="tag" style="margin:0; color:#d97706; border-color:#d97706;">워크플로우·에이전트</div>
+          <span style="font-size:12px; color:var(--muted);">4개</span>
+        </div>
+        <ul style="list-style:none; padding:0; margin:0; font-size:12px; color:#555; line-height:2;">
+          <li>· 조건 분기 노드?</li>
+          <li>· POST 요청 방법?</li>
+          <li>· 에이전트 vs 워크플로우?</li>
+          <li>· 오류 디버깅?</li>
+        </ul>
+      </div>
+
+      <div style="flex:1; background:#f7f5f0; border-radius:6px; padding:14px 16px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+          <div class="tag" style="margin:0; color:#7c3aed; border-color:#7c3aed;">지식관리</div>
+          <span style="font-size:12px; color:var(--muted);">3개</span>
+        </div>
+        <ul style="list-style:none; padding:0; margin:0; font-size:12px; color:#555; line-height:2;">
+          <li>· 문서 추가 방법?</li>
+          <li>· 유사도 검색 설정?</li>
+          <li>· 태그 기반 필터링?</li>
+        </ul>
+      </div>
+
+      <div style="flex:1; background:#f7f5f0; border-radius:6px; padding:14px 16px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+          <div class="tag dark" style="margin:0;">고급·API</div>
+          <span style="font-size:12px; color:var(--muted);">3개</span>
+        </div>
+        <ul style="list-style:none; padding:0; margin:0; font-size:12px; color:#555; line-height:2;">
+          <li>· Knowledge API 엔드포인트?</li>
+          <li>· 워크플로우 API 인증?</li>
+          <li>· MCP 연동 설정?</li>
+        </ul>
+      </div>
+
+      <div style="flex:1; background:#fdf0ed; border-radius:6px; padding:14px 16px; border:1px solid rgba(232,56,13,0.2);">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+          <div class="tag red" style="margin:0;">없는 내용</div>
+          <span style="font-size:12px; color:var(--muted);">2개</span>
+        </div>
+        <ul style="list-style:none; padding:0; margin:0; font-size:12px; color:#555; line-height:2;">
+          <li>· 슬랙 연동 되나요?</li>
+          <li>· 모바일 앱 있나요?</li>
+        </ul>
+        <p style="font-size:11px; color:var(--accent); margin-top:10px; line-height:1.6;">"매뉴얼에서 확인되지<br>않습니다"가 정답</p>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- 19 RAGAS 설명 -->
+  <div class="slide" id="s19">
+    <div class="label">MISO RAG · 측정 방법</div>
+    <h2>RAGAS</h2>
+    <p style="margin-top:6px; font-size:14px; color:var(--muted);">RAG 시스템의 답변 품질을 자동 평가하는 오픈소스 프레임워크</p>
+    <div class="two-col" style="margin-top:24px; align-items:start; gap:48px;">
+      <div>
+        <h3>청크 기반 <span style="font-weight:400; font-size:13px; color:var(--muted);">검색 품질 측정</span></h3>
+        <div class="divider" style="width:24px; margin:10px 0;"></div>
+        <ul class="clean-list">
+          <li><strong>Precision@K</strong> — 검색된 Top-K 청크 중 실제 관련 청크 비율</li>
+          <li><strong>Hit Rate</strong> — 정답 청크가 Top-K 안에 있는지 여부</li>
+          <li><strong>MRR</strong> — 정답 청크가 몇 번째 순위에 위치하는지</li>
+        </ul>
+        <p style="margin-top:14px; font-size:12px; color:var(--muted); line-height:1.7;">Precision은 RAGAS 자동 측정이 납득이 안 가서<br>→ 직접 골든 답 심어서 평가했음</p>
+      </div>
+      <div>
+        <h3>AI 기반 <span style="font-weight:400; font-size:13px; color:var(--muted);">답변 품질 측정</span></h3>
+        <div class="divider" style="width:24px; margin:10px 0;"></div>
+        <ul class="clean-list">
+          <li><strong>Faithfulness</strong> — 답변이 검색된 청크에 충실한지<br><span style="font-size:12px; color:var(--muted);">낮으면 모델이 멋대로 생성 (할루시네이션)</span></li>
+          <li><strong>Answer Relevancy</strong> — 답변이 질문과 얼마나 관련 있는지</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- 19b 실험 결과 -->
+  <div class="slide" id="s19b">
+    <div class="label">MISO RAG · 실험 결과</div>
+    <h2>5차례, 무엇을 바꿨나</h2>
+
+    <div style="display:flex; width:100%; gap:48px; margin-top:16px; align-items:flex-start;">
+
+      <!-- 왼쪽: 액션 타임라인 -->
+      <div style="flex:0 0 340px;">
+        <div class="pipe">
+
+          <div class="pipe-row">
+            <div class="pipe-line-col"><div class="pipe-dot done"></div><div class="pipe-vert"></div></div>
+            <div class="pipe-content">
+              <div style="display:flex; align-items:baseline; gap:8px; margin-bottom:2px;">
+                <span style="font-family:var(--handwriting); font-size:22px; color:var(--muted);">1차</span>
+                <div class="pipe-title">기본 세팅</div>
+              </div>
+              <div class="pipe-desc">DOCX 파일 · threshold 0.3 · chunk 200<br>베이스라인 수립</div>
+            </div>
+          </div>
+
+          <div class="pipe-row">
+            <div class="pipe-line-col"><div class="pipe-dot done" style="background:var(--accent); border-color:var(--accent);"></div><div class="pipe-vert"></div></div>
+            <div class="pipe-content">
+              <div style="display:flex; align-items:baseline; gap:8px; margin-bottom:2px;">
+                <span style="font-family:var(--handwriting); font-size:22px; color:var(--accent);">2차</span>
+                <div class="pipe-title">DOCX → 마크다운 변환</div>
+              </div>
+              <div class="pipe-desc">240페이지 직접 변환 · 구조 태그 정리<br>→ Hit · AR 전 구간 최고점 <span style="color:#2a9d5c; font-weight:600;">★ Best</span></div>
+            </div>
+          </div>
+
+          <div class="pipe-row">
+            <div class="pipe-line-col"><div class="pipe-dot done"></div><div class="pipe-vert"></div></div>
+            <div class="pipe-content">
+              <div style="display:flex; align-items:baseline; gap:8px; margin-bottom:2px;">
+                <span style="font-family:var(--handwriting); font-size:22px; color:var(--muted);">3차</span>
+                <div class="pipe-title">Breadcrumb 추가</div>
+              </div>
+              <div class="pipe-desc">Dify 권장 구조 반영 — "## 부모 &gt; 자식"<br>P@K 소폭 ↑ · Faith <span style="color:var(--accent); font-weight:600;">급락</span> (할루시네이션 증가)</div>
+            </div>
+          </div>
+
+          <div class="pipe-row">
+            <div class="pipe-line-col"><div class="pipe-dot done"></div><div class="pipe-vert"></div></div>
+            <div class="pipe-content">
+              <div style="display:flex; align-items:baseline; gap:8px; margin-bottom:2px;">
+                <span style="font-family:var(--handwriting); font-size:22px; color:var(--muted);">4차</span>
+                <div class="pipe-title">Breadcrumb 제거</div>
+              </div>
+              <div class="pipe-desc">원인 검증 목적 · 2차 마크다운으로 복원<br>→ P@K 회복 안 됨 · Faith 추가 하락</div>
+            </div>
+          </div>
+
+          <div class="pipe-row">
+            <div class="pipe-line-col"><div class="pipe-dot done"></div></div>
+            <div class="pipe-content">
+              <div style="display:flex; align-items:baseline; gap:8px; margin-bottom:2px;">
+                <span style="font-family:var(--handwriting); font-size:22px; color:var(--ink);">5차</span>
+                <div class="pipe-title">MD v2 + threshold 0.5</div>
+              </div>
+              <div class="pipe-desc">2차 문서 유지 · 임계값 올려 노이즈 제거<br>→ Hit · MRR 2차 수준 회복</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- 오른쪽: 지표 테이블 -->
+      <div style="flex:1;">
+        <table class="simple-table full-w">
+          <thead>
+            <tr>
+              <th style="width:36px;"></th>
+              <th style="text-align:right;">P@K (Precision)</th>
+              <th style="text-align:right;">Hit</th>
+              <th style="text-align:right;">MRR</th>
+              <th style="text-align:right;">Faith</th>
+              <th style="text-align:right;">AR</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="color:var(--muted); font-weight:500; white-space:nowrap;">1차</td>
+              <td class="num" style="text-align:right;">0.548</td>
+              <td class="num" style="text-align:right;">0.786</td>
+              <td class="num" style="text-align:right;">0.655</td>
+              <td class="num" style="text-align:right;">0.850</td>
+              <td class="num" style="text-align:right;">0.766</td>
+            </tr>
+            <tr style="background:#f0faf4;">
+              <td style="font-weight:700; color:var(--accent); white-space:nowrap;">2차</td>
+              <td class="num good" style="text-align:right;"><strong>0.619</strong></td>
+              <td class="num good" style="text-align:right;"><strong>0.857</strong></td>
+              <td class="num good" style="text-align:right;"><strong>0.786</strong></td>
+              <td class="num" style="text-align:right;">0.847</td>
+              <td class="num good" style="text-align:right;"><strong>0.825</strong></td>
+            </tr>
+            <tr>
+              <td style="color:var(--muted); font-weight:500; white-space:nowrap;">3차</td>
+              <td class="num" style="text-align:right;">0.631</td>
+              <td class="num" style="text-align:right;">0.786</td>
+              <td class="num" style="text-align:right;">0.714</td>
+              <td class="num warn" style="text-align:right;">0.601 ↓</td>
+              <td class="num warn" style="text-align:right;">0.696</td>
+            </tr>
+            <tr>
+              <td style="color:var(--muted); font-weight:500; white-space:nowrap;">4차</td>
+              <td class="num" style="text-align:right;">0.548</td>
+              <td class="num" style="text-align:right;">0.786</td>
+              <td class="num" style="text-align:right;">0.643</td>
+              <td class="num" style="text-align:right;">0.616</td>
+              <td class="num" style="text-align:right;">0.681</td>
+            </tr>
+            <tr style="background:#f0faf4;">
+              <td style="font-weight:700; white-space:nowrap;">5차</td>
+              <td class="num good" style="text-align:right;"><strong>0.619</strong></td>
+              <td class="num good" style="text-align:right;"><strong>0.857</strong></td>
+              <td class="num good" style="text-align:right;"><strong>0.786</strong></td>
+              <td class="num" style="text-align:right;">0.694</td>
+              <td class="num" style="text-align:right;">0.714</td>
+            </tr>
+          </tbody>
+        </table>
+        <p style="margin-top:14px; font-size:13px; color:var(--muted);">파라미터보다 <em>문서 형식(DOCX→마크다운)</em>이 더 컸다</p>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- 25 RAG 실행 결과 예시 -->
+  <div class="slide" id="s21">
+    <div class="label">MISO RAG · 평가</div>
+    <h2>실행 결과 예시 <span style="font-size:14px; font-weight:400; color:var(--muted); margin-left:8px;">2차 · 원본 데이터</span></h2>
+    <div style="margin-top:16px; overflow-x:auto; width:100%;">
+      <table style="width:100%; border-collapse:collapse; font-size:11.5px;">
+        <thead>
+          <tr style="border-bottom:2px solid #e8e4d9; background:#f7f5f0;">
+            <th style="padding:7px 10px; text-align:left; color:var(--muted); font-weight:500; white-space:nowrap;">차수</th>
+            <th style="padding:7px 10px; text-align:left; color:var(--muted); font-weight:500; white-space:nowrap;">유형</th>
+            <th style="padding:7px 10px; text-align:left; color:var(--muted); font-weight:500;">질문</th>
+            <th style="padding:7px 10px; text-align:left; color:var(--muted); font-weight:500;">answer (요약)</th>
+            <th style="padding:7px 8px; text-align:center; color:var(--muted); font-weight:500; white-space:nowrap;">P@K</th>
+            <th style="padding:7px 8px; text-align:center; color:var(--muted); font-weight:500; white-space:nowrap;">Hit</th>
+            <th style="padding:7px 8px; text-align:center; color:var(--muted); font-weight:500; white-space:nowrap;">MRR</th>
+            <th style="padding:7px 8px; text-align:center; color:var(--muted); font-weight:500; white-space:nowrap;">Faith</th>
+            <th style="padding:7px 8px; text-align:center; color:var(--muted); font-weight:500; white-space:nowrap;">AR</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Row 1 -->
+          <tr style="border-bottom:1px solid #ede9e1;">
+            <td style="padding:8px 10px; white-space:nowrap; font-weight:600; color:var(--muted);">2차</td>
+            <td style="padding:8px 10px; white-space:nowrap;">
+              <span style="background:#eaf0fb; color:#3b6fd4; font-size:10.5px; padding:2px 7px; border-radius:4px; font-weight:500;">기본 사용법</span>
+            </td>
+            <td style="padding:8px 10px; color:#333; line-height:1.5;">MISO AI에서 이미지를 생성하려면 어떻게 하나요?</td>
+            <td style="padding:8px 10px; color:#999; font-style:italic; line-height:1.5;">해당 내용은 MISO 매뉴얼에서 찾을 수 없습니다.</td>
+            <td style="padding:8px 8px; text-align:center;">
+              <span style="display:inline-block; background:#fee; color:#c0392b; font-weight:700; font-size:12px; padding:1px 6px; border-radius:4px;">0</span>
+            </td>
+            <td style="padding:8px 8px; text-align:center;"><span style="color:#c0392b; font-weight:700;">0</span></td>
+            <td style="padding:8px 8px; text-align:center;"><span style="color:#c0392b; font-weight:700;">0</span></td>
+            <td style="padding:8px 8px; text-align:center;">
+              <div style="display:flex; align-items:center; gap:4px; justify-content:center;">
+                <div style="width:36px; height:4px; background:#e0ddd8; border-radius:2px; overflow:hidden;"><div style="width:80%; height:100%; background:#6aab9c; border-radius:2px;"></div></div>
+                <span style="font-size:11px; color:#555;">0.8</span>
+              </div>
+            </td>
+            <td style="padding:8px 8px; text-align:center;">
+              <div style="display:flex; align-items:center; gap:4px; justify-content:center;">
+                <div style="width:36px; height:4px; background:#e0ddd8; border-radius:2px; overflow:hidden;"><div style="width:100%; height:100%; background:#3b6fd4; border-radius:2px;"></div></div>
+                <span style="font-size:11px; color:#555;">1.0</span>
+              </div>
+            </td>
+          </tr>
+          <!-- Row 2 -->
+          <tr style="border-bottom:1px solid #ede9e1;">
+            <td style="padding:8px 10px; white-space:nowrap; font-weight:600; color:var(--muted);">2차</td>
+            <td style="padding:8px 10px; white-space:nowrap;">
+              <span style="background:#eaf0fb; color:#3b6fd4; font-size:10.5px; padding:2px 7px; border-radius:4px; font-weight:500;">기본 사용법</span>
+            </td>
+            <td style="padding:8px 10px; color:#333; line-height:1.5;">비밀번호를 잊어버렸을 때 어떻게 재설정하나요?</td>
+            <td style="padding:8px 10px; color:#444; line-height:1.5;">입력한 이메일로 재설정 확인을 위한 메일이 발송됩니다.</td>
+            <td style="padding:8px 8px; text-align:center;"><span style="color:#27ae60; font-weight:700;">1</span></td>
+            <td style="padding:8px 8px; text-align:center;"><span style="color:#27ae60; font-weight:700;">1</span></td>
+            <td style="padding:8px 8px; text-align:center;"><span style="color:#27ae60; font-weight:700;">1</span></td>
+            <td style="padding:8px 8px; text-align:center;">
+              <div style="display:flex; align-items:center; gap:4px; justify-content:center;">
+                <div style="width:36px; height:4px; background:#e0ddd8; border-radius:2px; overflow:hidden;"><div style="width:95%; height:100%; background:#6aab9c; border-radius:2px;"></div></div>
+                <span style="font-size:11px; color:#555;">0.95</span>
+              </div>
+            </td>
+            <td style="padding:8px 8px; text-align:center;">
+              <div style="display:flex; align-items:center; gap:4px; justify-content:center;">
+                <div style="width:36px; height:4px; background:#e0ddd8; border-radius:2px; overflow:hidden;"><div style="width:95%; height:100%; background:#3b6fd4; border-radius:2px;"></div></div>
+                <span style="font-size:11px; color:#555;">0.95</span>
+              </div>
+            </td>
+          </tr>
+          <!-- Row 3 -->
+          <tr style="border-bottom:1px solid #ede9e1;">
+            <td style="padding:8px 10px; white-space:nowrap; font-weight:600; color:var(--muted);">2차</td>
+            <td style="padding:8px 10px; white-space:nowrap;">
+              <span style="background:#eaf0fb; color:#3b6fd4; font-size:10.5px; padding:2px 7px; border-radius:4px; font-weight:500;">기본 사용법</span>
+            </td>
+            <td style="padding:8px 10px; color:#333; line-height:1.5;">앱을 즐겨찾기에 추가하는 방법은?</td>
+            <td style="padding:8px 10px; color:#444; line-height:1.5;">검색 결과에서 APP 카드의 별(★) 클릭을 통해 즐겨찾기를 지정할 수 있습니다.</td>
+            <td style="padding:8px 8px; text-align:center;"><span style="color:#27ae60; font-weight:700;">1</span></td>
+            <td style="padding:8px 8px; text-align:center;"><span style="color:#27ae60; font-weight:700;">1</span></td>
+            <td style="padding:8px 8px; text-align:center;"><span style="color:#27ae60; font-weight:700;">1</span></td>
+            <td style="padding:8px 8px; text-align:center;">
+              <div style="display:flex; align-items:center; gap:4px; justify-content:center;">
+                <div style="width:36px; height:4px; background:#e0ddd8; border-radius:2px; overflow:hidden;"><div style="width:95%; height:100%; background:#6aab9c; border-radius:2px;"></div></div>
+                <span style="font-size:11px; color:#555;">0.95</span>
+              </div>
+            </td>
+            <td style="padding:8px 8px; text-align:center;">
+              <div style="display:flex; align-items:center; gap:4px; justify-content:center;">
+                <div style="width:36px; height:4px; background:#e0ddd8; border-radius:2px; overflow:hidden;"><div style="width:95%; height:100%; background:#3b6fd4; border-radius:2px;"></div></div>
+                <span style="font-size:11px; color:#555;">0.95</span>
+              </div>
+            </td>
+          </tr>
+          <!-- Row 4 -->
+          <tr style="border-bottom:1px solid #ede9e1;">
+            <td style="padding:8px 10px; white-space:nowrap; font-weight:600; color:var(--muted);">2차</td>
+            <td style="padding:8px 10px; white-space:nowrap;">
+              <span style="background:#f3eafc; color:#7c4dbd; font-size:10.5px; padding:2px 7px; border-radius:4px; font-weight:500;">워크플로우</span>
+            </td>
+            <td style="padding:8px 10px; color:#333; line-height:1.5;">파일을 업로드할 수 있는 형식은 어떤 게 있나요?</td>
+            <td style="padding:8px 10px; color:#444; line-height:1.5; font-size:11px;">txt, md, pdf, html, xlsx, docx, csv, pptx, epub(문서)과 jpg, png, gif, webp(이미지) 지원</td>
+            <td style="padding:8px 8px; text-align:center;"><span style="color:#27ae60; font-weight:700;">1</span></td>
+            <td style="padding:8px 8px; text-align:center;"><span style="color:#27ae60; font-weight:700;">1</span></td>
+            <td style="padding:8px 8px; text-align:center;"><span style="color:#27ae60; font-weight:700;">1</span></td>
+            <td style="padding:8px 8px; text-align:center;">
+              <div style="display:flex; align-items:center; gap:4px; justify-content:center;">
+                <div style="width:36px; height:4px; background:#e0ddd8; border-radius:2px; overflow:hidden;"><div style="width:95%; height:100%; background:#6aab9c; border-radius:2px;"></div></div>
+                <span style="font-size:11px; color:#555;">0.95</span>
+              </div>
+            </td>
+            <td style="padding:8px 8px; text-align:center;">
+              <div style="display:flex; align-items:center; gap:4px; justify-content:center;">
+                <div style="width:36px; height:4px; background:#e0ddd8; border-radius:2px; overflow:hidden;"><div style="width:95%; height:100%; background:#3b6fd4; border-radius:2px;"></div></div>
+                <span style="font-size:11px; color:#555;">0.95</span>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- 19c 레슨런 -->
+  <div class="slide" id="s19c">
+    <div class="label">MISO RAG · 레슨런</div>
+    <h2>레슨런</h2>
+    <div class="two-col" style="margin-top:24px; align-items:start; gap:48px;">
+      <div>
+        <h3>배운 것</h3>
+        <div class="divider" style="width:24px; margin:10px 0;"></div>
+        <ul class="clean-list">
+          <li>DOCX·PDF → 마크다운 변환이 효율적이다</li>
+          <li>RAGAS로 RAG 품질을 수치로 추적할 수 있다</li>
+          <li>하이퍼파라미터 튜닝 효과는 생각보다 작다</li>
+          <li>Dify 공식 가이드를 100% 반영 못한 게 아쉽다</li>
+        </ul>
+      </div>
+      <div>
+        <h3>다음 계획</h3>
+        <div class="divider" style="width:24px; margin:10px 0;"></div>
+        <p style="font-size:12px; color:var(--muted); font-weight:600; letter-spacing:0.04em; margin-bottom:6px;">단기</p>
+        <ul class="clean-list" style="margin-bottom:16px;">
+          <li>질문지 개선</li>
+          <li>청크·AI 통합 기준으로 재평가</li>
+        </ul>
+        <p style="font-size:12px; color:var(--muted); font-weight:600; letter-spacing:0.04em; margin-bottom:6px;">장기</p>
+        <ul class="clean-list">
+          <li>GraphRAG · LLM 위키 공부<br><span style="font-size:12px; color:var(--muted);">예: "에이전트 vs 워크플로우 차이는?" — 500자 청크로는<br>개념이 따로 놀아서 제대로 못 잡는 문제 해결</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- 20 마무리 -->
+  <div class="slide" id="s20">
+    <div style="position:absolute;top:0;right:0;width:42%;height:100%;overflow:hidden;pointer-events:none;">
+      <img src="end.jpeg" style="width:100%;height:100%;object-fit:cover;display:block;" />
+      <div style="position:absolute;inset:0;background:linear-gradient(to right,var(--paper) 0%,transparent 38%);"></div>
+    </div>
+    <div class="label">마무리</div>
+    <div style="margin-top:8px;">
+      <div style="font-size:13px; color:var(--muted); margin-bottom:20px;">데이터 민주화 시대에 살아남는 법</div>
+      <div style="font-family:var(--handwriting); font-size:clamp(40px, 6vw, 72px); line-height:1.2; color:var(--ink);">귀족은 못되더라도</div>
+      <div style="font-family:var(--handwriting); font-size:clamp(40px, 6vw, 72px); line-height:1.2; color:var(--accent); margin-bottom:28px;">6두품이라도 되자.</div>
+      <div class="divider"></div>
+      <p style="margin-top:20px; font-size:14px; color:#666; line-height:1.8; max-width:560px;">
+        실리콘밸리 개발자나, 빅테크 AI 전문가는 아니지만 —<br>
+        쳐보고, 실패하고, 숫자로 확인하면서 올라갈 수 있는 데까지.
+      </p>
+    </div>
+  </div>
+
+
+</div><!-- /deck -->
+
+<!-- 쿼리 오버레이 -->
+<div id="query-overlay" onclick="hideQuery()" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:200; align-items:center; justify-content:center;">
+  <div onclick="event.stopPropagation()" style="background:#1e1e1e; border-radius:8px; width:780px; max-width:92vw; max-height:88vh; overflow:hidden; display:flex; flex-direction:column; box-shadow:0 32px 80px rgba(0,0,0,0.6);">
+
+    <!-- 타이틀바 -->
+    <div style="display:flex; align-items:center; justify-content:space-between; padding:13px 20px; background:#2d2d2d; flex-shrink:0;">
+      <div style="display:flex; align-items:center; gap:7px;">
+        <span style="width:11px;height:11px;border-radius:50%;background:#ff5f57;display:inline-block;"></span>
+        <span style="width:11px;height:11px;border-radius:50%;background:#febc2e;display:inline-block;"></span>
+        <span style="width:11px;height:11px;border-radius:50%;background:#28c840;display:inline-block;"></span>
+        <span style="font-size:12px;color:#888;margin-left:10px;font-family:monospace;">ofc_sales_daily.sql</span>
+      </div>
+      <button onclick="hideQuery()" style="background:none;border:none;color:#666;cursor:pointer;font-size:20px;line-height:1;padding:0;">×</button>
+    </div>
+
+    <!-- 질문 배너 -->
+    <div style="background:#2a2d2e; padding:12px 20px; border-bottom:1px solid #333; flex-shrink:0;">
+      <span style="font-size:11px; letter-spacing:0.08em; text-transform:uppercase; color:#569cd6; margin-right:10px;">질문</span>
+      <span style="font-size:13px; color:#d4d4d4; font-family:'Noto Sans KR', sans-serif;">OFC의 어제(1/15) 매출이 궁금해요.</span>
+    </div>
+
+    <!-- 스크롤 영역 -->
+    <div style="overflow-y:auto; flex:1;">
+
+      <!-- SQL -->
+      <div style="padding:18px 20px; font-family:'Courier New',monospace; font-size:12px; line-height:1.75; border-bottom:1px solid #333;">
+        <div><span style="color:#569cd6;">SELECT</span></div>
+        <div style="padding-left:20px;"><span style="color:#9cdcfe;">M.part_ln</span> <span style="color:#569cd6;">AS</span> <span style="color:#ce9178;">manager_name</span><span style="color:#ccc;">,</span></div>
+        <div style="padding-left:20px;"><span style="color:#9cdcfe;">M.storenm</span> <span style="color:#569cd6;">AS</span> <span style="color:#ce9178;">store_name</span><span style="color:#ccc;">,</span></div>
+        <div style="padding-left:20px;"><span style="color:#dcdcaa;">SUM</span><span style="color:#ccc;">(S.ntsal_amt)</span> <span style="color:#569cd6;">AS</span> <span style="color:#ce9178;">net_sales</span><span style="color:#ccc;">,</span></div>
+        <div style="padding-left:20px;"><span style="color:#dcdcaa;">MAX</span><span style="color:#ccc;">(C.valid_cust_cnt)</span> <span style="color:#569cd6;">AS</span> <span style="color:#ce9178;">customer_count</span><span style="color:#ccc;">,</span></div>
+        <div style="padding-left:20px;"><span style="color:#dcdcaa;">ROUND</span><span style="color:#ccc;">(</span><span style="color:#569cd6;">CASE WHEN</span> <span style="color:#dcdcaa;">MAX</span><span style="color:#ccc;">(C.valid_cust_cnt) &gt; 0</span></div>
+        <div style="padding-left:60px;"><span style="color:#569cd6;">THEN</span> <span style="color:#dcdcaa;">SUM</span><span style="color:#ccc;">(S.ntsal_amt) /</span> <span style="color:#dcdcaa;">MAX</span><span style="color:#ccc;">(C.valid_cust_cnt)</span></div>
+        <div style="padding-left:60px;"><span style="color:#569cd6;">ELSE</span> <span style="color:#b5cea8;">0</span> <span style="color:#569cd6;">END</span><span style="color:#ccc;">, 2)</span> <span style="color:#569cd6;">AS</span> <span style="color:#ce9178;">avg_transaction_value</span></div>
+        <div><span style="color:#569cd6;">FROM</span> <span style="color:#4ec9b0;">gsr_offline.lgmjvdp_tb_store_dm</span> M</div>
+        <div><span style="color:#569cd6;">LEFT JOIN</span> <span style="color:#4ec9b0;">gsr_offline.lgmjvdp_tb_stk_ft</span> S</div>
+        <div style="padding-left:20px;"><span style="color:#569cd6;">ON</span> <span style="color:#dcdcaa;">TRIM</span><span style="color:#ccc;">(M.storecd) =</span> <span style="color:#dcdcaa;">TRIM</span><span style="color:#ccc;">(S.storecd)</span> <span style="color:#569cd6;">AND</span> S.datecd <span style="color:#ccc;">= </span><span style="color:#ce9178;">'2026-01-15'</span></div>
+        <div><span style="color:#569cd6;">LEFT JOIN</span> <span style="color:#ccc;">(</span></div>
+        <div style="padding-left:20px;"><span style="color:#569cd6;">SELECT</span> <span style="color:#569cd6;">CASE WHEN</span> origin_bizpl_cd <span style="color:#569cd6;">LIKE</span> <span style="color:#ce9178;">'V%'</span></div>
+        <div style="padding-left:60px;"><span style="color:#569cd6;">THEN</span> <span style="color:#dcdcaa;">SUBSTR</span><span style="color:#ccc;">(origin_bizpl_cd, 2)</span> <span style="color:#569cd6;">ELSE</span> origin_bizpl_cd <span style="color:#569cd6;">END AS</span> <span style="color:#ce9178;">clean_storecd</span><span style="color:#ccc;">,</span></div>
+        <div style="padding-left:60px;"><span style="color:#dcdcaa;">COUNT</span><span style="color:#ccc;">(</span><span style="color:#569cd6;">DISTINCT</span> <span style="color:#dcdcaa;">CONCAT</span><span style="color:#ccc;">(pos_no,</span> <span style="color:#ce9178;">'-'</span><span style="color:#ccc;">,</span> <span style="color:#dcdcaa;">CAST</span><span style="color:#ccc;">(sale_seq</span> <span style="color:#569cd6;">AS STRING</span><span style="color:#ccc;">)))</span> <span style="color:#569cd6;">AS</span> <span style="color:#ce9178;">valid_cust_cnt</span></div>
+        <div style="padding-left:20px;"><span style="color:#569cd6;">FROM</span> <span style="color:#4ec9b0;">gsr_offline.gsucdw_tb_ft_cvs_tr_item</span></div>
+        <div style="padding-left:20px;"><span style="color:#569cd6;">WHERE</span> oper_dt <span style="color:#ccc;">= </span><span style="color:#ce9178;">'2026-01-15'</span> <span style="color:#569cd6;">AND</span> sale_sp <span style="color:#ccc;">= </span><span style="color:#ce9178;">'1'</span> <span style="color:#569cd6;">AND</span> item_purch_qty <span style="color:#ccc;">&gt; 0</span></div>
+        <div style="padding-left:60px;"><span style="color:#569cd6;">AND</span> sku_cancel_yn <span style="color:#ccc;">= </span><span style="color:#ce9178;">'N'</span> <span style="color:#569cd6;">AND</span> deal_sp <span style="color:#569cd6;">IN</span> <span style="color:#ccc;">(</span><span style="color:#ce9178;">'01','33','61','49'</span><span style="color:#ccc;">) AND goods_cd &lt;&gt; </span><span style="color:#ce9178;">''</span></div>
+        <div style="padding-left:20px;"><span style="color:#569cd6;">GROUP BY</span> <span style="color:#b5cea8;">1</span></div>
+        <div><span style="color:#ccc;">) C</span> <span style="color:#569cd6;">ON</span> <span style="color:#dcdcaa;">TRIM</span><span style="color:#ccc;">(M.storecd) =</span> <span style="color:#dcdcaa;">TRIM</span><span style="color:#ccc;">(C.clean_storecd)</span></div>
+        <div><span style="color:#569cd6;">WHERE</span> M.part_ln <span style="color:#ccc;">= </span><span style="color:#ce9178;">'김재영'</span> <span style="color:#6a9955;">-- OFC명</span></div>
+        <div><span style="color:#569cd6;">ORDER BY</span> net_sales <span style="color:#569cd6;">DESC</span></div>
+      </div>
+
+      <!-- 결과 -->
+      <div style="padding:14px 20px; border-bottom:1px solid #333;">
+        <div style="font-size:10px; letter-spacing:0.1em; text-transform:uppercase; color:#666; margin-bottom:10px;">결과</div>
+        <table style="width:100%; border-collapse:collapse; font-family:'Courier New',monospace; font-size:12px;">
+          <thead>
+            <tr style="border-bottom:1px solid #3a3a3a;">
+              <th style="text-align:left; padding:5px 12px 5px 0; color:#888; font-weight:400;">OFC명</th>
+              <th style="text-align:left; padding:5px 12px 5px 0; color:#888; font-weight:400;">매장명</th>
+              <th style="text-align:right; padding:5px 12px 5px 0; color:#888; font-weight:400;">매출</th>
+              <th style="text-align:right; padding:5px 12px 5px 0; color:#888; font-weight:400;">객수</th>
+              <th style="text-align:right; padding:5px 0; color:#888; font-weight:400;">객단가</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr style="border-bottom:1px solid #2a2a2a;">
+              <td style="padding:6px 12px 6px 0; color:#ccc;">김재영</td>
+              <td style="padding:6px 12px 6px 0; color:#ccc;">브라이튼여의도1 (GE48:CW1)</td>
+              <td style="text-align:right; padding:6px 12px 6px 0; color:#28c840; font-weight:600;">4,966,108</td>
+              <td style="text-align:right; padding:6px 12px 6px 0; color:#ccc;">717</td>
+              <td style="text-align:right; padding:6px 0; color:#ccc;">6,926</td>
+            </tr>
+            <tr style="border-bottom:1px solid #2a2a2a;">
+              <td style="padding:6px 12px 6px 0; color:#ccc;">김재영</td>
+              <td style="padding:6px 12px 6px 0; color:#ccc;">이태원프리미엄 (8W69:CE1)</td>
+              <td style="text-align:right; padding:6px 12px 6px 0; color:#28c840; font-weight:600;">4,071,186</td>
+              <td style="text-align:right; padding:6px 12px 6px 0; color:#ccc;">377</td>
+              <td style="text-align:right; padding:6px 0; color:#ccc;">10,798</td>
+            </tr>
+            <tr style="border-bottom:1px solid #2a2a2a;">
+              <td style="padding:6px 12px 6px 0; color:#ccc;">김재영</td>
+              <td style="padding:6px 12px 6px 0; color:#ccc;">용산파크자이 (HP89:CN1)</td>
+              <td style="text-align:right; padding:6px 12px 6px 0; color:#28c840; font-weight:600;">4,026,241</td>
+              <td style="text-align:right; padding:6px 12px 6px 0; color:#ccc;">476</td>
+              <td style="text-align:right; padding:6px 0; color:#ccc;">8,458</td>
+            </tr>
+            <tr>
+              <td style="padding:6px 12px 6px 0; color:#ccc;">김재영</td>
+              <td style="padding:6px 12px 6px 0; color:#ccc;">신길파크자이 (EW68:CN1)</td>
+              <td style="text-align:right; padding:6px 12px 6px 0; color:#28c840; font-weight:600;">3,032,246</td>
+              <td style="text-align:right; padding:6px 12px 6px 0; color:#ccc;">434</td>
+              <td style="text-align:right; padding:6px 0; color:#ccc;">6,986</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- 테이블 팁 -->
+      <div style="padding:14px 20px;">
+        <div style="font-size:10px; letter-spacing:0.1em; text-transform:uppercase; color:#666; margin-bottom:10px;">데이터 테이블</div>
+        <div style="display:flex; flex-direction:column; gap:6px; font-family:'Courier New',monospace; font-size:12px;">
+          <div><span style="color:#4ec9b0;">lgmjvdp_tb_store_dm</span> <span style="color:#666;">—</span> <span style="color:#888;">점포 테이블 (점포, 담당자 정보)</span></div>
+          <div><span style="color:#4ec9b0;">lgmjvdp_tb_stk_ft</span> <span style="color:#666;">—</span> <span style="color:#888;">수불 테이블 (일별 매출 데이터)</span></div>
+          <div><span style="color:#4ec9b0;">gsucdw_tb_ft_cvs_tr_item</span> <span style="color:#666;">—</span> <span style="color:#888;">영수증 테이블 (고객 데이터)</span></div>
+          <div style="margin-top:6px; color:#6a9955;">-- 객단가 = SUM(수불.ntsal_amt) ÷ COUNT(영수증.건수)</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- UI -->
+<div class="slide-tag" id="slideTag">1 / 23</div>
+<div class="progress" id="progress" style="width:4.35%;"></div>
+<div class="nav">
+  <button class="nav-btn" id="prevBtn" onclick="go(-1)">←</button>
+  <span class="nav-count" id="navCount">1 / 23</span>
+  <button class="nav-btn" id="nextBtn" onclick="go(1)">→</button>
+</div>
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  const total = slides.length;
+  let cur = 0;
+
+  // 로드 시 카운터 초기화
+  document.getElementById('navCount').textContent = '1 / ' + total;
+  document.getElementById('slideTag').textContent = '1 / ' + total;
+  document.getElementById('progress').style.width = (1 / total * 100) + '%';
+
+  function show(n) {
+    slides[cur].classList.remove('active');
+    cur = Math.max(0, Math.min(n, total - 1));
+    slides[cur].classList.add('active');
+    document.getElementById('navCount').textContent = (cur + 1) + ' / ' + total;
+    document.getElementById('slideTag').textContent = (cur + 1) + ' / ' + total;
+    document.getElementById('progress').style.width = ((cur + 1) / total * 100) + '%';
+  }
+
+  function go(dir) { show(cur + dir); }
+
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') { e.preventDefault(); go(1); }
+    if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') { e.preventDefault(); go(-1); }
+  });
+
+  // 쿼리 오버레이
+  function showQuery() {
+    const el = document.getElementById('query-overlay');
+    el.style.display = 'flex';
+  }
+  function hideQuery() {
+    document.getElementById('query-overlay').style.display = 'none';
+  }
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') hideQuery();
+  });
+
+  // Touch swipe
+  let tx = 0;
+  document.addEventListener('touchstart', function(e) { tx = e.touches[0].clientX; });
+  document.addEventListener('touchend', function(e) {
+    const dx = e.changedTouches[0].clientX - tx;
+    if (Math.abs(dx) > 40) go(dx < 0 ? 1 : -1);
+  });
+</script>
+</body>
+</html>
